@@ -6,9 +6,13 @@ This is still pretty much a work in progress, but functional enough to work in m
 I made this utility to be able to rename and add custom partitions to mdm9607 modems, but should work mostly as-is in any oldish Qualcomm device using a NAND and not requiring a signed partition table (make sure you have EDL access to the device just in case).
 
 Build it with `make`
+
 Run it with `./make_mibib`
+
 It will generate an equivalent to `partition_complete_p2k_p128k.mbn` called `mibib.mbn` as included with your typical firmware update file for a qualcomm Modem.
+
 The example partition layout is in the C file (will add support to read it from file soon)
+
 ```
 static const struct {
   uint8_t id;
