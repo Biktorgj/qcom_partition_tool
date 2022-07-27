@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <argp.h>
+
 #define RELEASE_VER "0.0.3"
 
 /* MBN Header Magic */
@@ -16,8 +18,6 @@
 #define MBN_FOOTER_MG1 0x9D41BEA1
 #define MBN_FOOTER_MG2 0xF1DED2EA
 #define MBN_FOOTER_VERSION 0x00000001
-#define MBN_FOOTER_MG4 0x4FC78CDB
-uint32_t crc_result;
 
 /* Starting at 0x800 comes the GPT */
 /* GPT Header Magic */
@@ -57,7 +57,7 @@ static const struct {
     {0, 10368, 0xff, 0x01, 0x00, 0x00, "0:recoveryfs"}, //
     {0, 30720, 0xff, 0x01, 0x00, 0x00, "0:usr_data"},   //
     {0, 256, 0xff, 0x01, 0x00, 0x00, "0:sec"},
-    {0, 37760, 0xff, 0x01, 0x00, 0x00, "0:system"}, //
+    {0, 37760, 0xff, 0x01, 0x00, 0x00, "0:system"},
 };
 
 static const struct {
@@ -234,7 +234,7 @@ int main(void) {
 
     // Total output buffer size
     bufwrsz += sizeof(struct partition_def); 
-    // Partition list block size
+    // Partition list size
     partition_layout_sz += sizeof(struct partition_def); 
     // Increase the offset on this partition
     offset += part_list[i].size;
@@ -248,26 +248,11 @@ int main(void) {
   footer->magic2 = MBN_FOOTER_MG2;
   footer->version = MBN_FOOTER_VERSION;
 
- // find_seed(output_buffer, bufwrsz);
- // memset(output_buffer, 0, bufwrsz);
   footer->crcval = xcrc32(output_buffer, bufwrsz, 0);
 
   memset(output_buffer + bufwrsz, 0xff, (PAGE_SIZE * 1024 * sizeof(uint8_t)));
   bufwrsz+=  (PAGE_SIZE * 1024 * sizeof(uint8_t));
-//>> Looking for 4fc78cdb with seed 386a7ce2. Got 4fc78cdb
 
-  /*
-   for ( uint32_t seed = 0; seed < 0x1FFFFFFF; seed++) {
-     if (footer->crcval == MBN_FOOTER_MG4 || (htobe32(footer->crcval) ==
-   MBN_FOOTER_MG4)) { printf ("Looking for %.8x with seed %.8x. Got %.8x
-   (%.8x)\n", MBN_FOOTER_MG4, seed, footer->crcval, htobe32(footer->crcval));
-       printf("We have a fucking match!!!!\n\n\n");
-       break;
-     }
-   }
- */
-  // CRC Should be 0xdb 8c c7 4f for the broadmobi list
-  //  CRC Should be 0x02 61 5d de for the Quectel list
   printf("3. Writing footer with CRC %.8x...\n", footer->crcval);
   memcpy(output_buffer + bufwrsz, footer, sizeof(struct mbn_crc_footer));
   bufwrsz += sizeof(struct mbn_crc_footer);
