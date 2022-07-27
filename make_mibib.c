@@ -32,6 +32,7 @@
 
 #define MBN_OUTPUT_FILE "mibib.mbn"
 #define OUTPUT_FILE_SZ 1310720 // (640 sectors x 2048 byte sector size)
+/*
 static const struct {
   uint8_t id;
   uint32_t size;
@@ -59,7 +60,7 @@ static const struct {
     {0, 256, 0xff, 0x01, 0x00, 0x00, "0:sec"},
     {0, 37760, 0xff, 0x01, 0x00, 0x00, "0:system"},
 };
-
+*/
 static const struct {
   uint8_t id;
   uint32_t size;
