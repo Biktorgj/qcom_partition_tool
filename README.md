@@ -1,51 +1,40 @@
-# make_mibib
+# Partitioning tool for Qualcomm based devices
 ### Small utility to re-create the partition table for Qualcomm devices
 
-This is still pretty much a work in progress, but functional enough to work in mdm9607 platforms.
+This is a small utility I created to be able to repartition mdm9x07 based modems, but should work with (any?most?) qualcomm device which has a `mibib` partition.
 
-I made this utility to be able to rename and add custom partitions to mdm9607 modems, but should work mostly as-is in any oldish Qualcomm device using a NAND and not requiring a signed partition table (make sure you have EDL access to the device just in case).
+*****************************************************************************
+    ## WARNING ##
+                               
+    You can *easily* kill your device with this tool
+    Have a proper EFS backup
+    Have a full EDL dump that *you know* you can restore if something breaks
+#### I'm in no way responsible for any damage done to any device as a result of using this tool.
+*****************************************************************************
 
-Build it with `make`
+#### Usage:
 
-Run it with `./make_mibib`
+`make mibib -i INPUT_FILE -o OUTPUT_FILE -p page_size -b block_size -s sector_size`
 
-It will generate an equivalent to `partition_complete_p2k_p128k.mbn` called `mibib.mbn` as included with your typical firmware update file for a qualcomm Modem.
 
-The example partition layout is in the C file (will add support to read it from file soon)
+#### Arguments: 
 
-```
-static const struct {
-  uint8_t id;
-  uint32_t size;
-  uint8_t attr1;
-  uint8_t attr2;
-  uint8_t attr3;
-  uint8_t which_flash;
-  const char *name;
-} part_list[] = {
-    {0, 640, 0xff, 0x01, 0x00, 0x00, "0:SBL"},
-    {0, 640, 0xff, 0x01, 0xff, 0x00, "0:MIBIB"},
-    {0, 6144, 0xff, 0x01, 0xff, 0x00, "0:EFS2"},
-    {0, 1152, 0xff, 0x01, 0x00, 0x00, "0:TZ"},
-    {0, 192, 0xff, 0x01, 0x00, 0x00, "0:DEVCFG"},
-    {0, 192, 0xff, 0x01, 0x00, 0x00, "0:APDP"},
-    {0, 256, 0xff, 0x01, 0x00, 0x00, "0:MSADP"},
-    {0, 128, 0xff, 0x01, 0x00, 0x00, "0:INFO"},
-    {0, 256, 0xff, 0x01, 0x00, 0x00, "0:MBA"},
-    {0, 256, 0xff, 0x01, 0x00, 0x00, "0:ACDB"},
-    {0, 192, 0xff, 0x01, 0x00, 0x00, "0:RPM"},
-    {0, 24192, 0xff, 0x01, 0x00, 0x00, "0:QDSP"},
-    {0, 2624, 0xff, 0x01, 0x00, 0x00, "0:APPS"},
-    {0, 256, 0xff, 0x01, 0x00, 0x00, "0:Cache_QDSP"},
-    {0, 256, 0xff, 0x01, 0x00, 0x00, "0:Cache_APPS"},
-    {0, 256, 0xff, 0x01, 0x00, 0x00, "0:Cache_ACDB"},
-    {0, 256, 0xff, 0x01, 0x00, 0x00, "0:misc"},
-    {0, 1536, 0xff, 0x01, 0x00, 0x00, "0:EFS2BAK"},
-    {0, 256, 0xff, 0x01, 0x00, 0x00, "0:BACKUP"},
-    {0, 128, 0xff, 0x01, 0x00, 0x00, "0:sec"},
-    {0, 3968, 0xff, 0x01, 0x00, 0x00, "0:boot"},
-    {0, 21760, 0xff, 0x01, 0x00, 0x00, "0:system"},
-};
-```
+  -i: Input file with the partition table schema
 
-This partition table mimics the Broadmobi BM818 modem, but replaces the last partition (EFS2APPS) with a boot and system partition to be able to hold a small linux install
+  -o: Output file (.mbn) that will be flashed later
+
+  -p: Page size: Used to properly align the file to what the SBL expects (in K)
+
+  -s: Sector Size: Used to calculate the correct size from the number of sectors (in bytes)
+
+  -b: Block size: Used to calculate the size from the number of sectors (in bytes)
+
+#### Example:
+
+For a NAND flash with a page size of 2048 (2K), sector size of 2048 bytes, and 128K blocks:
+  
+	 `./make_mibib -i examples/mdm9607-example-broadmobi-linux.conf -o flashable_file.mbn -p 2 -s 2048 -b 131072`
+
+### Building it
+1. Run `make`
+
