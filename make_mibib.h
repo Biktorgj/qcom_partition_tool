@@ -10,8 +10,10 @@
 #ifndef __MAKE_MIBIB_H__
 #define __MAKE_MIBIB_H__
 
-#define RELEASE_VER "0.0.3"
+#define RELEASE_VER "0.0.4"
 
+#define MAX_PARTITION_NUM 32
+#define MAX_PARTITION_NAME_SZ 16
 /* MBN Header Magic */
 /*  ac 9f 56 fe 7a 12 7f cd  04 00 00 00 01 00 00 00 */
 #define MBN_HEADER_MAGIC1 0xFE569FAC
@@ -28,12 +30,6 @@
 #define HEADER_MAGIC2 0xE35EBDDB
 #define HEADER_VERSION 4
 
-/* Block sizes */
-#define PAGE_SIZE 2
-#define SECTOR_SIZE 2048  // 2K
-#define BLOCK_SIZE 131072 // 128KB
-
-#define MBN_OUTPUT_FILE "mibib.mbn"
 #define OUTPUT_FILE_SZ 1310720 // (640 sectors x 2048 byte sector size)
 
 /* Make MIBIB */
@@ -72,5 +68,15 @@ struct mbn_crc_footer {
   uint32_t version;
   uint32_t crcval;
 } __attribute__((packed));
+
+struct partition_list {
+  uint32_t size;
+  uint8_t attr1;
+  uint8_t attr2;
+  uint8_t attr3;
+  uint8_t which_flash;
+  char name[MAX_PARTITION_NAME_SZ];
+};
+
 
 #endif
