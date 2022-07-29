@@ -51,7 +51,7 @@ void showHelp() {
                   "\t-b: Block size: Used to calculate the size from the "
                   "number of sectors (in bytes)\n");
   fprintf(stdout, "Example:\n"
-                  "\t ./make_mibib -i example-mdm9607.list -o "
+                  "\t ./make_mibib -i examples/mdm9607-example-quectel-eg25-linux.conf -o "
                   "flashable_file.mbn -p 2 -s 2048 -b 131072\n");
   fprintf(stdout, "\n"
                   "************************************************************"
